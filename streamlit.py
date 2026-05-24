@@ -1,8 +1,5 @@
-!pip install streamlit pyngrok
-
-from pyngrok import ngrok
-
 %%writefile app.py
+
 
 # importing libraries
 import streamlit as st
@@ -36,22 +33,71 @@ def load_data():
 
 literacy, illiteracy, gdp_schooling = load_data()
 
-# main page setup
-st.set_page_config(page_title="Global Literacy and GDP ", layout="wide")
-st.title("🧠💰Global Literacy and GDP Dashboard")
-st.subheader("Welcome to the Global Literacy Dashboard!👋")
-st.markdown("""This dashboard provides insights into global literacy rates, illiteracy population, and the relationship between GDP and schooling years.
-Use the sidebar to navigate through different sections.""")
-
 # side bar
 st.sidebar.title("Menu")
 page = st.sidebar.selectbox(
     "Options",
-    [ "SQL Query Executor", "EDA Visualizations", "Country Profile Page"])
+    [ "Home", "SQL Query Executor", "EDA Visualizations", "Country Profile Page"])
+
+if page == "Home": # main page setup
+  st.set_page_config(page_title="Global Literacy and GDP ", layout="wide")
+  st.title("🧠💰Global Literacy and GDP Dashboard")
+  st.subheader("Welcome to the Global Literacy Dashboard!👋")
+  st.markdown("""This project is a data analysis and visualization dashboard that explores global literacy rates, illiteracy rates, and GDP trends across different countries over the years. The project was developed using SQL, Python, Pandas, and Streamlit to perform data analysis, execute SQL queries, and create interactive visualizations.
+  The main objective of this project is to understand how literacy and education levels relate to economic growth and development in different regions of the world.
+
+  ## Features
+  * Analyze adult and youth literacy rates across countries
+  * Compare male and female literacy rates by region
+  * Track illiteracy trends over multiple years
+  * Explore GDP and average years of schooling
+  * Perform SQL-based analytical queries dynamically
+  * Interactive visualizations using Plotly, Matplotlib, and Seaborn
+  * Streamlit dashboard with multiple analysis pages
+  ---
+  ## Technologies Used
+  * Python
+  * Pandas
+  * SQL / SQLite
+  * Streamlit
+  * Plotly Express
+  * Matplotlib
+  * Seaborn
+  ---
+  ## Key Analyses Performed
+
+  ### Literacy Analysis
+  * Top countries with highest literacy rates
+  * Female literacy analysis
+  * Region-wise literacy comparison
+  * Literacy trends over years
+
+  ### Illiteracy Analysis
+  * Countries with high illiteracy rates
+  * Illiteracy trend analysis
+  * Country-wise comparison
+
+  ### GDP and Education Analysis
+  * Relationship between GDP and schooling
+  * GDP per schooling analysis
+  * Global schooling trends
+---
+  ## Project Outcome
+  This project helps understand:
+  * Global education development trends
+  * Literacy growth across regions
+  * Gender-based literacy differences
+  * The relationship between education and economic growth
+  ---
+  ## Author
+  Mohamed Halith M K
+  """)
 
 #page 1: sql query page
-if page == "SQL Query Executor":
-  st.title("SQL Query Executor")
+elif page == "SQL Query Executor":
+  st.title("⚡💾 SQL Query Executor")
+  st.markdown("""Dive into data exploration using SQL queries that reveal literacy patterns, economic growth, and educational progress worldwide.
+  Also, Analyze global education and economic indicators with ready-to-use SQL queries, interactive tables, and insightful visualizations.""")
 
   queries = {
       "Literacy Rates and Trends":{
@@ -241,6 +287,7 @@ if page == "SQL Query Executor":
 elif page == "EDA Visualizations":
 
     st.title("📊 EDA Visualizations")
+    st.markdown("Gain deeper understanding of global education data through exploratory charts, trends, and comparative visualizations.")
 
     eda_options = [
         "Adult & Youth Literacy Rate Over Years",
@@ -273,11 +320,14 @@ elif page == "EDA Visualizations":
     # 1
     if eda_name == "Adult & Youth Literacy Rate Over Years":
       adult_literacy = literacy.groupby("Year")["Adult"].mean()
-      youth_literacy = literacy.groupby("Year")["Total_Youth"].mean()
+      male_literacy = literacy.groupby("Year")["Male"].mean()
+      female_literacy = literacy.groupby("Year")["Female"].mean()
+      
 
       fig, ax = plt.subplots(figsize=(15, 8))
 
-      ax.plot(youth_literacy.index, youth_literacy.values, label="Youth")
+      ax.plot(male_literacy.index, male_literacy.values, label="Male")
+      ax.plot(female_literacy.index, female_literacy.values, label="Female")
       ax.plot(adult_literacy.index, adult_literacy.values, label="Adult")
 
       ax.set_title("Avg Literacy Rate Over Years of Adult & Youth")
@@ -323,45 +373,45 @@ elif page == "EDA Visualizations":
 
     # 4
     elif eda_name == "Illiteracy Rate comparision betweeen selected countries over years":
-        countries = ["Bangladesh", "China", "India", "Nepal", "Pakistan"]
+      countries = ["Bangladesh", "China", "India", "Nepal", "Pakistan"]
+      
+      com_countries = illiteracy[illiteracy["Country"].isin(countries)]
+      
+      fig, ax = plt.subplots(figsize=(15, 8))
+      
+      sns.barplot(data=com_countries, x="Year", y="Illiteracy_rate", hue="Country", palette="magma", ax=ax)
 
-        com_countries = illiteracy[illiteracy["Country"].isin(countries)]
+      ax.set_title("Illiteracy Rate of Five Countries")
+      ax.set_xlabel("Year")
+      ax.set_ylabel("Illiteracy Rate")
 
-        fig, ax = plt.subplots(figsize=(15, 8))
+      ax.legend(loc="upper right")
+      ax.grid(False)
 
-        sns.barplot(data=com_countries, x="Year", y="Illiteracy_rate", palette="magma", ax=ax)
-
-        ax.set_title("Illiteracy Rate of Five Countries")
-        ax.set_xlabel("Year")
-        ax.set_ylabel("Illiteracy Rate")
-
-        ax.legend(loc="upper right")
-        ax.grid(False)
-
-        st.pyplot(fig)
+      st.pyplot(fig)
 
     # 5
     elif eda_name == "Illiterates vs Literates trend over Years":
 
-        data = illiteracy.groupby("Year", as_index=False)[["Illiteracy_rate", "Literacy_rate"]].mean()
+      data = illiteracy.groupby("Year", as_index=False)[["Illiteracy_rate", "Literacy_rate"]].mean()
 
-        fig = px.line(data, x="Year", y=["Illiteracy_rate", "Literacy_rate"], markers=True)
+      fig = px.line(data, x="Year", y=["Illiteracy_rate", "Literacy_rate"], markers=True)
 
-        show_chart(fig)
+      show_chart(fig)
 
     # 6
     elif eda_name == "GDP per Avg Schooling":
 
-        fig = px.scatter(gdp_schooling, x="Avg_yrs_schooling", y="GDP", color="Region")
+      fig = px.scatter(gdp_schooling, x="Avg_yrs_schooling", y="GDP", color="Region")
 
-        show_chart(fig)
+      show_chart(fig)
 
     # 7
     elif eda_name == "GDP Distribution Boxplot":
 
-        fig = px.box(gdp_schooling, x="Year", y="GDP")
+      fig = px.box(gdp_schooling, x="Year", y="GDP")
 
-        show_chart(fig)
+      show_chart(fig)
 
     # 8
     elif eda_name == "Correlation of Population and Literacy":
@@ -401,17 +451,17 @@ elif page == "EDA Visualizations":
     # 10
     elif eda_name == "Literacy Growth Rate over year - India.":
 
-        data = literacy[
-            literacy["Country"] == "India"][["Year", "Adult", "Avg_Youth_Literacy"]]
+      data = literacy[literacy["Country"] == "India"][["Year", "Adult", "Avg_Youth_Literacy"]]
 
-        fig = px.line(data, x="Year", y=["Adult", "Avg_Youth_Literacy"], markers=True)
+      fig = px.line(data, x="Year", y=["Adult", "Avg_Youth_Literacy"], markers=True)
 
-        show_chart(fig)
+      show_chart(fig)
 
 # page 3
 elif page == "Country Profile Page":
 
     st.title("🌍 Country Profile Page")
+    st.markdown("Discover country-level trends and insights in literacy, education quality, schooling, and development indicators.")
     country = st.selectbox("Select Country", sorted(literacy["Country"].unique()))
     row1_col1, row1_col2 = st.columns(2)
     row3_col1, row3_col2 = st.columns(2)
@@ -459,9 +509,3 @@ elif page == "Country Profile Page":
       fig2 = px.line(gdp_data, x="Year", y="GDP", markers=True, title=f"{country} GDP Over Years")
 
       st.plotly_chart(fig2, use_container_width=True)
-
-ngrok.set_auth_token("3DfZN4RcDTbGEZxx7cfRRAi045e_5xLeR6pKV57CM634VJbgt")
-!streamlit run app.py &>/content/logs.txt &
-
-public_url = ngrok.connect(8501)
-print(public_url)
