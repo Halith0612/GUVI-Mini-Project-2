@@ -1,5 +1,8 @@
-%%writefile app.py
+## for colab
+!pip install streamlit pyngrok
+from pyngrok import ngrok
 
+%%writefile app.py
 
 # importing libraries
 import streamlit as st
@@ -509,3 +512,11 @@ elif page == "Country Profile Page":
       fig2 = px.line(gdp_data, x="Year", y="GDP", markers=True, title=f"{country} GDP Over Years")
 
       st.plotly_chart(fig2, use_container_width=True)
+
+## for colab deployment
+ngrok.set_auth_token("3DfZN4RcDTbGEZxx7cfRRAi045e_5xLeR6pKV57CM634VJbgt")
+
+!streamlit run app.py &>/content/logs.txt &
+
+public_url = ngrok.connect(8501)
+print(public_url)
