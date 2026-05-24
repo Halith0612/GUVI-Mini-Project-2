@@ -105,15 +105,6 @@ This project helps understand:
 
 ---
 
-## Future Improvements
-
-* Add machine learning prediction models
-* Deploy dashboard online
-* Add real-time dataset updates
-* Improve UI/UX design
-* Add downloadable reports
-
----
 
 ## Author
 
