@@ -24,7 +24,7 @@ The main objective of this project is to understand how literacy and education l
 
 * Python
 * Pandas
-* SQL / SQLite
+* MySQL
 * Streamlit
 * Plotly Express
 * Matplotlib
@@ -106,8 +106,6 @@ This project helps understand:
 ---
 
 
-## Author
-
-Mohamed Halith M K
+## Mohamed Halith M K
 
 
